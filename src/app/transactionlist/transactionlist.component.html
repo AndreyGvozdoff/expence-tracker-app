@@ -1,0 +1,132 @@
+<section class="insert-form" [formGroup]="transactionForm">
+  <h2>Transaction App</h2>
+
+  <mat-form-field appearance="outline" color="accent" class="desc">
+    <mat-label>Name</mat-label>
+    <input type="text" matInput formControlName="name">
+    <mat-error>Required!</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" color="accent" class="amt">
+    <mat-label>Amount</mat-label>
+    <input type="text" mask="separator.2" matInput formControlName="amount">
+    <mat-error>Required!</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" color="accent" class="date">
+    <mat-label>Date</mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="date">
+    <mat-hint>MM/DD/YYYY</mat-hint>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+
+
+  <mat-form-field appearance="outline" color="accent" class="type">
+    <mat-label>Type</mat-label>
+    <mat-select formControlName="type">
+      <mat-option *ngFor="let type of typeList" [value]="type">{{ type }}</mat-option>
+    </mat-select>
+    <mat-error>Required!</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" color="accent" class="category">
+    <mat-label>Category</mat-label>
+    <mat-chip-grid #reactiveChipGrid aria-label="Enter reactive form keywords" formControlName="category">
+      @for (keyword of reactiveKeywords(); track keyword) {
+        <mat-chip-row (removed)="removeReactiveKeyword(keyword)">
+          {{keyword}}
+          <button matChipRemove aria-label="'remove reactive form' + keyword">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+      }
+    </mat-chip-grid>
+    <input
+      placeholder="New category..."
+      [matChipInputFor]="reactiveChipGrid"
+      (matChipInputTokenEnd)="addReactiveKeyword($event)"
+    />
+  </mat-form-field>
+  <br>
+  <button mat-raised-button color="accent" [disabled]="transactionForm.invalid" (click)="insertForm()">
+    Add Transaction
+  </button>
+</section>
+
+<section class="table">
+  <mat-table [dataSource]="dataSource" matSort (matSortChange)="announceSortChange($event)">
+
+    <ng-container matColumnDef="id">
+      <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="date">
+      <mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by date">Date</mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        {{element.date | date:'YYYY-MM-dd'}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.name}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="amount">
+      <mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by amount">Amount</mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.amount}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="type">
+      <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        {{element.type}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="category">
+      <mat-header-cell mat-header-cell *matHeaderCellDef>Category</mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        {{element.category}}
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="createdOn">
+      <mat-header-cell *matHeaderCellDef>Created On</mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        {{element.createdOn | date:'YYYY-MM-dd'}}
+      </mat-cell>>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef>Delete</mat-header-cell>
+      <mat-cell *matCellDef="let element">
+<!-- Not Done -->
+<!--        <button mat-icon-button color="accent" matTooltip="Edit this transaction" (click)="edit(element)">-->
+<!--          <mat-icon>edit</mat-icon>-->
+<!--        </button>-->
+        <button mat-icon-button color="warn" matTooltip="Delete this transaction" (click)="deleteElement(element)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: columns"></mat-row>
+  </mat-table>
+  <section [formGroup]="filterForm" class="filter-form">
+    <mat-form-field appearance="outline" color="accent">
+      <input (keyup)="applyFilter($event)" matInput placeholder="Filter by Category, Name, etc." />
+    </mat-form-field>
+    <mat-form-field appearance="outline" color="accent">
+      <mat-label>Filter by Type</mat-label>
+      <mat-select formControlName="type">
+        <mat-option *ngFor="let type of typeList" [value]="type">{{ type }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </section>
+  <br>
+  <p>Total Balance: {{totalBalance}}</p>
+</section>
